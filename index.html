@@ -7,30 +7,53 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0d0d0d;
-    --surface: #181818;
-    --surface2: #222222;
-    --border: rgba(255,255,255,0.08);
-    --border2: rgba(255,255,255,0.14);
-    --text: #f0ede8;
-    --muted: #888;
-    --accent: #e8c96a;
-    --accent2: #f0a05a;
-    --green: #5fcf8a;
-    --green-dim: rgba(95,207,138,0.12);
+    --bg: #06090c;
+    --surface: #0f1419;
+    --surface2: #18202a;
+    --border: rgba(170,200,215,0.07);
+    --border2: rgba(170,200,215,0.14);
+    --text: #e7e4dc;
+    --muted: #6c7a85;
+    --accent: #d8b96a;
+    --accent2: #e0905a;
+    --green: #6fcf9a;
+    --green-dim: rgba(111,207,154,0.12);
     --red: #ff6b6b;
-    --needed: #f0a05a;
-    --needed-dim: rgba(240,160,90,0.12);
-    --optional: #6ab8e8;
-    --optional-dim: rgba(106,184,232,0.12);
+    --needed: #e0905a;
+    --needed-dim: rgba(224,144,90,0.12);
+    --optional: #6ab0d8;
+    --optional-dim: rgba(106,176,216,0.12);
+    --mist: rgba(150,180,195,0.06);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    background: var(--bg);
+    background:
+      radial-gradient(ellipse 120% 80% at 50% 120%, rgba(30,55,65,0.35) 0%, transparent 55%),
+      linear-gradient(180deg, #06090c 0%, #04070a 55%, #070b0f 100%);
+    background-attachment: fixed;
     color: var(--text);
     font-family: 'DM Sans', sans-serif;
     min-height: 100vh;
     padding: 0 0 80px;
+  }
+  /* Vignette: dunkle Ränder, klare Mitte */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 50;
+    background: radial-gradient(ellipse 95% 75% at 50% 35%, transparent 52%, rgba(0,0,0,0.6) 100%);
+  }
+  /* Bodennebel über dem "Wasser" */
+  body::after {
+    content: '';
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    height: 220px;
+    pointer-events: none;
+    z-index: 50;
+    background: linear-gradient(to top, rgba(25,45,52,0.55), rgba(20,38,45,0.18) 45%, transparent);
   }
 
   /* Hero */
@@ -39,8 +62,28 @@
     padding: 56px 24px 40px;
     text-align: center;
     border-bottom: 1px solid var(--border);
-    background: radial-gradient(ellipse 80% 60% at 50% -20%, rgba(232,201,106,0.13) 0%, transparent 70%);
+    background:
+      radial-gradient(ellipse 60% 50% at 50% -25%, rgba(150,180,200,0.16) 0%, transparent 60%),
+      radial-gradient(ellipse 90% 70% at 50% -10%, rgba(216,185,106,0.10) 0%, transparent 65%);
     overflow: hidden;
+  }
+  /* Driftender Nebel */
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: -40% -15% auto -15%;
+    height: 220%;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 45% 35% at 28% 32%, var(--mist), transparent 60%),
+      radial-gradient(ellipse 40% 30% at 72% 48%, var(--mist), transparent 60%),
+      radial-gradient(ellipse 50% 32% at 50% 70%, var(--mist), transparent 65%);
+    filter: blur(26px);
+    animation: drift 26s ease-in-out infinite alternate;
+  }
+  @keyframes drift {
+    from { transform: translate3d(-3%, 0, 0) scale(1); }
+    to   { transform: translate3d(4%, -2%, 0) scale(1.08); }
   }
   .hero::before {
     content: '';
@@ -64,6 +107,7 @@
     font-weight: 600;
     margin-bottom: 10px;
   }
+  .hero > * { position: relative; z-index: 2; }
   .hero h1 {
     font-family: 'Playfair Display', serif;
     font-size: clamp(36px, 8vw, 64px);
@@ -72,8 +116,9 @@
     letter-spacing: -0.02em;
     color: var(--text);
     margin-bottom: 12px;
+    text-shadow: 0 0 28px rgba(150,180,200,0.25), 0 2px 12px rgba(0,0,0,0.5);
   }
-  .hero h1 span { color: var(--accent); }
+  .hero h1 span { color: var(--accent); text-shadow: 0 0 26px rgba(216,185,106,0.35); }
   .hero-sub {
     font-size: 15px;
     color: var(--muted);
@@ -203,7 +248,6 @@
   }
   .item:last-child { border-bottom: none; }
   .item:hover { background: var(--surface2); }
-  .item.claimed { opacity: 0.7; }
   .check {
     width: 24px;
     height: 24px;
@@ -216,7 +260,7 @@
     transition: all 0.15s;
     font-size: 13px;
   }
-  .item.claimed .check {
+  .item.mine .check {
     background: var(--green);
     border-color: var(--green);
     color: #0d0d0d;
@@ -227,10 +271,6 @@
     font-weight: 500;
     color: var(--text);
     transition: color 0.15s;
-  }
-  .item.claimed .item-name {
-    text-decoration: line-through;
-    color: var(--muted);
   }
   .item-who {
     font-size: 11px;
@@ -250,6 +290,39 @@
   .badge-needed { background: var(--needed-dim); color: var(--needed); }
   .badge-optional { background: var(--optional-dim); color: var(--optional); }
   .badge-claimed { background: var(--green-dim); color: var(--green); }
+
+  /* Quantity stepper */
+  .qty {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .qty-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    color: var(--text);
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .qty-btn:hover { border-color: var(--green); background: var(--green-dim); }
+  .qty-btn:active { transform: scale(0.92); }
+  .qty-num {
+    min-width: 20px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--green);
+  }
 
   /* Add custom item */
   .add-box {
@@ -330,6 +403,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
+    z-index: 60;
   }
   .sync-dot {
     width: 6px;
@@ -341,6 +415,9 @@
     background: var(--accent);
     animation: pulse 0.8s infinite;
   }
+  .sync-dot.offline {
+    background: var(--red);
+  }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
   /* Scrollbar */
@@ -350,17 +427,23 @@
 </style>
 </head>
 <body>
+<!--
+  🤓 Ey du! Ja, genau DU, der hier den Quellcode aufmacht.
+  Statt auf der Party zu feiern liest du HTML? Absoluter Geek-Lord.
+  Respekt für den Move – aber jetzt: Handy weg und bring extra Bier mit. 🍻
+-->
 
-<div class="sync"><div class="sync-dot" id="sync-dot"></div><span id="sync-label">live</span></div>
+<div class="sync"><div class="sync-dot" id="sync-dot"></div><span id="sync-label">verbinde...</span></div>
 
 <div class="hero">
   <div class="hero-label">🎂 Tariq's Geburtstag</div>
   <h1>Was bringst du<br><span>mit?</span></h1>
-  <p class="hero-sub">Trag deinen Namen ein, hak ab was du mitbringst – oder füg selbst etwas hinzu!</p>
+  <p class="hero-sub">Werte Genossen und Mitstreiter: Trotz meines Anspruchs, an meinem Geburtstag etwas für euch herzurichten, kann ich leider keine 50 hungrigen und durstigen Mäuler stopfen. Wäre super cool, wenn ihr mir da helfen könnt.</p>
   <div class="stats">
     <div class="stat"><span class="stat-num" id="st-total">0</span><span class="stat-label">Sachen</span></div>
-    <div class="stat"><span class="stat-num" id="st-claimed">0</span><span class="stat-label">geclaimed</span></div>
+    <div class="stat"><span class="stat-num" id="st-claimed">0</span><span class="stat-label">übernommen</span></div>
     <div class="stat"><span class="stat-num" id="st-open">0</span><span class="stat-label">noch offen</span></div>
+    <div class="stat"><span class="stat-num" id="st-people">0</span><span class="stat-label">Stück gesamt</span></div>
   </div>
 </div>
 
@@ -375,60 +458,81 @@
 
 <div class="toast" id="toast"></div>
 
-<script>
-const STORAGE_KEY = "tariq_party_2026";
+<script type="module">
+// ==========================================================================
+//  FIREBASE EINRICHTUNG
+//  Ersetze das Objekt unten durch deine eigene Firebase-Konfiguration.
+//  (Schritt-für-Schritt-Anleitung hast du von mir bekommen.)
+// ==========================================================================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCaYI_-rOqo5gaJucT3y3Z8965SlwIxP3o",
+  authDomain: "jenseitsdesseesmitbringliste.firebaseapp.com",
+  databaseURL: "https://jenseitsdesseesmitbringliste-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "jenseitsdesseesmitbringliste",
+  storageBucket: "jenseitsdesseesmitbringliste.firebasestorage.app",
+  messagingSenderId: "1068812522220",
+  appId: "1:1068812522220:web:45b5b2f7b0318672318bc9"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const dataRef = ref(db, "party");
+// ==========================================================================
 
 const DEFAULT_DATA = [
   {
     cat: "🍺 Alkohol",
     items: [
-      { name: "Bier (Kiste)", priority: "needed", claimed: false, who: "" },
-      { name: "Wein (rot)", priority: "needed", claimed: false, who: "" },
-      { name: "Wein (weiß)", priority: "needed", claimed: false, who: "" },
-      { name: "Sekt / Prosecco", priority: "optional", claimed: false, who: "" },
-      { name: "Vodka", priority: "optional", claimed: false, who: "" },
-      { name: "Rum", priority: "optional", claimed: false, who: "" },
-      { name: "Gin", priority: "optional", claimed: false, who: "" },
-      { name: "Whisky", priority: "optional", claimed: false, who: "" },
+      { name: "Bier (Kiste)", priority: "needed", claims: [] },
+      { name: "Wein (rot)", priority: "needed", claims: [] },
+      { name: "Wein (weiß)", priority: "needed", claims: [] },
+      { name: "Sekt / Prosecco", priority: "optional", claims: [] },
+      { name: "Vodka", priority: "optional", claims: [] },
+      { name: "Rum", priority: "optional", claims: [] },
+      { name: "Gin", priority: "optional", claims: [] },
+      { name: "Whisky", priority: "optional", claims: [] },
     ]
   },
   {
     cat: "🥤 Softdrinks & Mixer",
     items: [
-      { name: "Cola", priority: "needed", claimed: false, who: "" },
-      { name: "Wasser (still)", priority: "needed", claimed: false, who: "" },
-      { name: "Wasser (sprudelnd)", priority: "needed", claimed: false, who: "" },
-      { name: "Säfte / Schorlen", priority: "optional", claimed: false, who: "" },
-      { name: "Energy Drinks", priority: "optional", claimed: false, who: "" },
-      { name: "Tonic Water", priority: "optional", claimed: false, who: "" },
+      { name: "Cola", priority: "needed", claims: [] },
+      { name: "Wasser (still)", priority: "needed", claims: [] },
+      { name: "Wasser (sprudelnd)", priority: "needed", claims: [] },
+      { name: "Säfte / Schorlen", priority: "optional", claims: [] },
+      { name: "Energy Drinks", priority: "optional", claims: [] },
+      { name: "Tonic Water", priority: "optional", claims: [] },
     ]
   },
   {
     cat: "🍕 Essen",
     items: [
-      { name: "Chips & Snacks", priority: "needed", claimed: false, who: "" },
-      { name: "Brot / Brötchen", priority: "needed", claimed: false, who: "" },
-      { name: "Grill-Fleisch", priority: "optional", claimed: false, who: "" },
-      { name: "Gemüse / Salat", priority: "optional", claimed: false, who: "" },
-      { name: "Dips (Hummus etc.)", priority: "optional", claimed: false, who: "" },
-      { name: "Dessert / Kuchen", priority: "optional", claimed: false, who: "" },
+      { name: "Chips & Snacks", priority: "needed", claims: [] },
+      { name: "Brot / Brötchen", priority: "needed", claims: [] },
+      { name: "Grill-Fleisch", priority: "optional", claims: [] },
+      { name: "Gemüse / Salat", priority: "optional", claims: [] },
+      { name: "Dips (Hummus etc.)", priority: "optional", claims: [] },
+      { name: "Dessert / Kuchen", priority: "optional", claims: [] },
     ]
   },
   {
     cat: "⛺ Party-Equipment",
     items: [
-      { name: "Partyzelt", priority: "needed", claimed: false, who: "" },
-      { name: "Partylichter", priority: "needed", claimed: false, who: "" },
-      { name: "Kabeltrommel", priority: "needed", claimed: false, who: "" },
+      { name: "Partyzelt", priority: "needed", claims: [] },
+      { name: "Partylichter", priority: "needed", claims: [] },
+      { name: "Kabeltrommel", priority: "needed", claims: [] },
     ]
   },
   {
     cat: "🏓 Beer Pong & Rage Cage",
     items: [
-      { name: "Beer Pong Becher", priority: "needed", claimed: false, who: "" },
-      { name: "Beer Pong Bälle", priority: "needed", claimed: false, who: "" },
-      { name: "Rage Cage Tisch", priority: "needed", claimed: false, who: "" },
-      { name: "Trichter", priority: "needed", claimed: false, who: "" },
+      { name: "Beer Pong Becher", priority: "needed", claims: [] },
+      { name: "Beer Pong Bälle", priority: "needed", claims: [] },
+      { name: "Rage Cage Tisch", priority: "needed", claims: [] },
+      { name: "Trichter", priority: "needed", claims: [] },
     ]
   }
 ];
@@ -436,52 +540,75 @@ const DEFAULT_DATA = [
 let state = JSON.parse(JSON.stringify(DEFAULT_DATA));
 let collapsed = {};
 let myName = "";
-let pollTimer = null;
+let ready = false;
 
-// --- Storage ---
-async function load() {
-  setSyncing(true);
-  try {
-    const res = await window.storage?.get(STORAGE_KEY, true);
-    if (res && res.value) {
-      const saved = JSON.parse(res.value);
-      if (saved && saved.length) state = saved;
+// Firebase lässt leere Arrays weg -> fehlende Felder wieder ergänzen.
+// Claims sind Objekte {name, qty}. Alte Formate (Strings / {claimed, who}) migrieren.
+function normalize(data) {
+  // 🤓 Ahh, du schnüffelst im Quellcode rum statt zu feiern? Riesen-Nerd.
+  data.forEach(sec => {
+    if (!sec.items) sec.items = [];
+    sec.items.forEach(item => {
+      if (!Array.isArray(item.claims)) {
+        item.claims = item.who ? [{ name: item.who, qty: 1 }] : [];
+      }
+      item.claims = item.claims
+        .filter(c => c != null)
+        .map(c => typeof c === "string"
+          ? { name: c, qty: 1 }
+          : { name: c.name, qty: Math.max(1, parseInt(c.qty) || 1) });
+      delete item.claimed;
+      delete item.who;
+    });
+  });
+}
+
+// --- Firebase: live mithören ---
+function connect() {
+  onValue(dataRef, (snapshot) => {
+    const val = snapshot.val();
+    if (val && Array.isArray(val) && val.length) {
+      normalize(val);
+      const incoming = JSON.stringify(val);
+      if (ready && incoming !== JSON.stringify(state)) {
+        showToast("Liste wurde aktualisiert 🔄");
+      }
+      state = val;
+    } else if (!val) {
+      // Datenbank ist leer -> mit Standardliste befüllen
+      save();
     }
-  } catch(e) {}
-  setSyncing(false);
-  render();
+    ready = true;
+    setOnline();
+    render();
+  }, (err) => {
+    setOffline();
+  });
 }
 
 async function save() {
   setSyncing(true);
   try {
-    await window.storage?.set(STORAGE_KEY, JSON.stringify(state), true);
-  } catch(e) {}
+    await set(dataRef, state);
+  } catch (e) {
+    setOffline();
+  }
   setSyncing(false);
 }
 
 function setSyncing(s) {
   const dot = document.getElementById("sync-dot");
   const lbl = document.getElementById("sync-label");
-  if (s) { dot.className = "sync-dot syncing"; lbl.textContent = "syncing..."; }
+  if (s) { dot.className = "sync-dot syncing"; lbl.textContent = "speichern..."; }
   else { dot.className = "sync-dot"; lbl.textContent = "live"; }
 }
-
-// Poll for updates every 8 seconds
-function startPoll() {
-  pollTimer = setInterval(async () => {
-    try {
-      const res = await window.storage?.get(STORAGE_KEY, true);
-      if (res && res.value) {
-        const saved = JSON.parse(res.value);
-        if (saved && JSON.stringify(saved) !== JSON.stringify(state)) {
-          state = saved;
-          render();
-          showToast("Liste wurde aktualisiert 🔄");
-        }
-      }
-    } catch(e) {}
-  }, 8000);
+function setOnline() {
+  document.getElementById("sync-dot").className = "sync-dot";
+  document.getElementById("sync-label").textContent = "live";
+}
+function setOffline() {
+  document.getElementById("sync-dot").className = "sync-dot offline";
+  document.getElementById("sync-label").textContent = "offline";
 }
 
 // --- Render ---
@@ -489,12 +616,15 @@ function render() {
   const main = document.getElementById("main");
   main.innerHTML = "";
 
-  let total = 0, claimed = 0;
+  let total = 0, claimed = 0, pieces = 0;
+  const me = (document.getElementById("my-name").value || "").trim().toLowerCase();
 
   state.forEach((sec, si) => {
-    const secClaimed = sec.items.filter(i => i.claimed).length;
-    total += sec.items.length;
+    const items = sec.items || [];
+    const secClaimed = items.filter(i => (i.claims || []).length > 0).length;
+    total += items.length;
     claimed += secClaimed;
+    items.forEach(i => (i.claims || []).forEach(c => pieces += (c.qty || 1)));
     const isCollapsed = collapsed[si];
 
     const div = document.createElement("div");
@@ -505,7 +635,7 @@ function render() {
     header.innerHTML = `
       <span class="section-emoji">${sec.cat.split(' ')[0]}</span>
       <span class="section-title">${sec.cat.split(' ').slice(1).join(' ')}</span>
-      <span class="section-pill ${secClaimed === sec.items.length && sec.items.length > 0 ? 'done' : ''}">${secClaimed}/${sec.items.length}</span>
+      <span class="section-pill ${secClaimed === items.length && items.length > 0 ? 'done' : ''}">${secClaimed}/${items.length}</span>
       <span class="section-chevron">▼</span>
     `;
     header.addEventListener("click", () => {
@@ -516,20 +646,47 @@ function render() {
     const list = document.createElement("div");
     list.className = "items-list";
 
-    sec.items.forEach((item, ii) => {
+    items.forEach((item, ii) => {
+      const claims = item.claims || [];
+      const total = claims.reduce((s, c) => s + (c.qty || 1), 0);
+      const mineIdx = me ? claims.findIndex(c => c.name.toLowerCase() === me) : -1;
+      const mine = mineIdx !== -1;
       const row = document.createElement("div");
-      row.className = "item" + (item.claimed ? " claimed" : "");
+      row.className = "item" + (mine ? " mine" : "");
+
+      const whoText = claims
+        .map(c => `${escapeHtml(c.name)} ×${c.qty || 1}`)
+        .join(", ");
+
+      let right;
+      if (mine) {
+        // Stepper: passe deine eigene Stückzahl an
+        right = `<div class="qty">
+          <button class="qty-btn" data-act="dec">−</button>
+          <span class="qty-num">${claims[mineIdx].qty}</span>
+          <button class="qty-btn" data-act="inc">+</button>
+        </div>`;
+      } else if (total > 0) {
+        right = `<span class="item-badge badge-claimed">✓ ${total}×</span>`;
+      } else {
+        right = `<span class="item-badge ${item.priority === 'needed' ? 'badge-needed' : 'badge-optional'}">${item.priority === "needed" ? "benötigt" : "optional"}</span>`;
+      }
+
       row.innerHTML = `
-        <div class="check">${item.claimed ? "✓" : ""}</div>
+        <div class="check">${mine ? "✓" : ""}</div>
         <div class="item-info">
-          <div class="item-name">${item.name}</div>
-          ${item.claimed && item.who ? `<div class="item-who">↳ ${item.who}</div>` : ""}
+          <div class="item-name">${escapeHtml(item.name)}</div>
+          ${claims.length > 0 ? `<div class="item-who">↳ ${whoText}</div>` : ""}
         </div>
-        <span class="item-badge ${item.claimed ? 'badge-claimed' : item.priority === 'needed' ? 'badge-needed' : 'badge-optional'}">
-          ${item.claimed ? "✓ geclaimed" : item.priority === "needed" ? "benötigt" : "optional"}
-        </span>
+        ${right}
       `;
-      row.addEventListener("click", () => toggleItem(si, ii));
+
+      if (mine) {
+        row.querySelector('[data-act="inc"]').addEventListener("click", e => { e.stopPropagation(); changeQty(si, ii, +1); });
+        row.querySelector('[data-act="dec"]').addEventListener("click", e => { e.stopPropagation(); changeQty(si, ii, -1); });
+      } else {
+        row.addEventListener("click", () => claimItem(si, ii));
+      }
       list.appendChild(row);
     });
 
@@ -541,13 +698,13 @@ function render() {
   // Add box
   const addBox = document.createElement("div");
   addBox.className = "add-box";
-  const catOptions = state.map((s, i) => `<option value="${i}">${s.cat}</option>`).join("");
+  const catOptions = state.map((s, i) => `<option value="${i}">${escapeHtml(s.cat)}</option>`).join("");
   addBox.innerHTML = `
     <div class="add-box-title">+ Etwas hinzufügen</div>
     <div class="add-row">
       <input type="text" id="new-item-name" placeholder="Was bringst du mit?" />
       <select id="new-item-cat">${catOptions}</select>
-      <button class="add-btn" onclick="addItem()">Hinzufügen</button>
+      <button class="add-btn" id="add-btn">Hinzufügen</button>
     </div>
   `;
   main.appendChild(addBox);
@@ -555,24 +712,55 @@ function render() {
   document.getElementById("st-total").textContent = total;
   document.getElementById("st-claimed").textContent = claimed;
   document.getElementById("st-open").textContent = total - claimed;
+  document.getElementById("st-people").textContent = pieces;
 
   const nameEl = document.getElementById("new-item-name");
   if (nameEl) {
     nameEl.addEventListener("keydown", e => { if (e.key === "Enter") addItem(); });
   }
+  const addBtn = document.getElementById("add-btn");
+  if (addBtn) addBtn.addEventListener("click", addItem);
 }
 
-function toggleItem(si, ii) {
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+function myNameTrimmed() {
+  return document.getElementById("my-name").value.trim();
+}
+
+// Trag dich mit Stückzahl 1 ein (mehrere Leute pro Item erlaubt).
+function claimItem(si, ii) {
   const item = state[si].items[ii];
-  if (!item.claimed) {
-    const name = document.getElementById("my-name").value.trim();
-    item.claimed = true;
-    item.who = name || "Jemand";
-    showToast(`"${item.name}" geclaimed${name ? " von " + name : ""} ✓`);
-  } else {
-    item.claimed = false;
-    item.who = "";
-    showToast(`"${item.name}" wieder freigegeben`);
+  if (!Array.isArray(item.claims)) item.claims = [];
+  const name = myNameTrimmed();
+  if (!name) {
+    showToast("Trag oben erst deinen Namen ein 🙂");
+    return;
+  }
+  const idx = item.claims.findIndex(c => c.name.toLowerCase() === name.toLowerCase());
+  if (idx === -1) {
+    item.claims.push({ name, qty: 1 });
+    showToast(`"${item.name}" – danke ${name}! ✓`);
+    save();
+    render();
+  }
+}
+
+// +1 / -1 auf deine eigene Stückzahl. Bei 0 meldest du dich ab.
+function changeQty(si, ii, delta) {
+  const item = state[si].items[ii];
+  const name = myNameTrimmed();
+  if (!name) return;
+  const idx = item.claims.findIndex(c => c.name.toLowerCase() === name.toLowerCase());
+  if (idx === -1) return;
+  item.claims[idx].qty += delta;
+  if (item.claims[idx].qty <= 0) {
+    item.claims.splice(idx, 1);
+    showToast(`"${item.name}" wieder abgemeldet`);
   }
   save();
   render();
@@ -584,8 +772,9 @@ function addItem() {
   const name = nameEl ? nameEl.value.trim() : "";
   const si = catEl ? parseInt(catEl.value) : 0;
   if (!name) return;
-  const myN = document.getElementById("my-name").value.trim();
-  state[si].items.push({ name, priority: "optional", claimed: !!myN, who: myN || "" });
+  const myN = myNameTrimmed();
+  if (!state[si].items) state[si].items = [];
+  state[si].items.push({ name, priority: "optional", claims: myN ? [{ name: myN, qty: 1 }] : [] });
   nameEl.value = "";
   save();
   render();
@@ -599,16 +788,22 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove("show"), 2600);
 }
 
-// Name persistence
+// Name persistence (lokal pro Gerät)
 document.getElementById("my-name").addEventListener("input", function() {
   myName = this.value;
   localStorage.setItem("party_name", myName);
+  render();
 });
 const savedName = localStorage.getItem("party_name");
 if (savedName) { document.getElementById("my-name").value = savedName; myName = savedName; }
 
-load();
-startPoll();
+render();
+connect();
 </script>
+<!--
+  Immer noch am Lesen? Hardcore-Nerd-Energie. 🤓
+  Okay, du hast es dir verdient: das geheime Easter Egg ist...
+  ...dass es kein Easter Egg gibt. Geh feiern, du Quellcode-Schnüffler. 🎉
+-->
 </body>
 </html>
