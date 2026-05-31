@@ -466,6 +466,7 @@
 // ==========================================================================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCaYI_-rOqo5gaJucT3y3Z8965SlwIxP3o",
@@ -479,6 +480,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const auth = getAuth(app);
 const dataRef = ref(db, "party");
 // ==========================================================================
 
@@ -798,7 +800,20 @@ const savedName = localStorage.getItem("party_name");
 if (savedName) { document.getElementById("my-name").value = savedName; myName = savedName; }
 
 render();
-connect();
+
+// Erst anonym anmelden, dann erst mit der Datenbank verbinden.
+// So darf nur, wer die Seite geladen hat, lesen/schreiben (Regel: auth != null).
+let connected = false;
+onAuthStateChanged(auth, (user) => {
+  if (user && !connected) {
+    connected = true;
+    connect();
+  }
+});
+signInAnonymously(auth).catch((e) => {
+  setOffline();
+  console.error("Anmeldung fehlgeschlagen:", e.code, e.message);
+});
 </script>
 <!--
   Immer noch am Lesen? Hardcore-Nerd-Energie. 🤓
