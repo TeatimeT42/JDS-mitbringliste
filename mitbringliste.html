@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎉 Mitbringliste</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #181818;
+    --surface2: #222222;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #f0ede8;
+    --muted: #888;
+    --accent: #e8c96a;
+    --accent2: #f0a05a;
+    --green: #5fcf8a;
+    --green-dim: rgba(95,207,138,0.12);
+    --red: #ff6b6b;
+    --needed: #f0a05a;
+    --needed-dim: rgba(240,160,90,0.12);
+    --optional: #6ab8e8;
+    --optional-dim: rgba(106,184,232,0.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  /* Hero */
+  .hero {
+    position: relative;
+    padding: 56px 24px 40px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    background: radial-gradient(ellipse 80% 60% at 50% -20%, rgba(232,201,106,0.13) 0%, transparent 70%);
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      90deg, transparent, transparent 39px,
+      rgba(255,255,255,0.02) 39px, rgba(255,255,255,0.02) 40px
+    ),
+    repeating-linear-gradient(
+      0deg, transparent, transparent 39px,
+      rgba(255,255,255,0.02) 39px, rgba(255,255,255,0.02) 40px
+    );
+    pointer-events: none;
+  }
+  .hero-label {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 8vw, 64px);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero-sub {
+    font-size: 15px;
+    color: var(--muted);
+    max-width: 440px;
+    margin: 0 auto 28px;
+    line-height: 1.6;
+  }
+
+  /* Stats */
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 40px;
+    padding: 8px 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+  }
+  .stat-num {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+    font-family: 'Playfair Display', serif;
+  }
+  .stat-label { color: var(--muted); font-size: 12px; }
+
+  /* Name banner */
+  .name-bar {
+    max-width: 640px;
+    margin: 24px auto 0;
+    padding: 0 20px;
+  }
+  .name-input-wrap {
+    display: flex;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 10px 16px;
+    gap: 10px;
+  }
+  .name-input-wrap label {
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+    font-weight: 500;
+  }
+  .name-input-wrap input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .name-input-wrap input::placeholder { color: rgba(255,255,255,0.2); }
+
+  /* Main */
+  .main { max-width: 640px; margin: 28px auto 0; padding: 0 20px; }
+
+  /* Section */
+  .section {
+    margin-bottom: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .section:hover { border-color: var(--border2); }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    user-select: none;
+  }
+  .section-emoji { font-size: 18px; }
+  .section-title {
+    flex: 1;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text);
+  }
+  .section-pill {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: var(--surface2);
+    color: var(--muted);
+    letter-spacing: 0.03em;
+  }
+  .section-pill.done {
+    background: var(--green-dim);
+    color: var(--green);
+  }
+  .section-chevron {
+    font-size: 12px;
+    color: var(--muted);
+    transition: transform 0.2s;
+  }
+  .section.collapsed .section-chevron { transform: rotate(-90deg); }
+  .section.collapsed .items-list { display: none; }
+
+  /* Items */
+  .items-list { padding: 4px 0; }
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: background 0.12s;
+    border-bottom: 1px solid var(--border);
+  }
+  .item:last-child { border-bottom: none; }
+  .item:hover { background: var(--surface2); }
+  .item.claimed { opacity: 0.7; }
+  .check {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+    font-size: 13px;
+  }
+  .item.claimed .check {
+    background: var(--green);
+    border-color: var(--green);
+    color: #0d0d0d;
+  }
+  .item-info { flex: 1; min-width: 0; }
+  .item-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    transition: color 0.15s;
+  }
+  .item.claimed .item-name {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+  .item-who {
+    font-size: 11px;
+    color: var(--green);
+    margin-top: 2px;
+    font-weight: 500;
+  }
+  .item-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .badge-needed { background: var(--needed-dim); color: var(--needed); }
+  .badge-optional { background: var(--optional-dim); color: var(--optional); }
+  .badge-claimed { background: var(--green-dim); color: var(--green); }
+
+  /* Add custom item */
+  .add-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .add-box-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .add-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .add-row input, .add-row select {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 9px 12px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .add-row input:focus, .add-row select:focus { border-color: var(--accent); }
+  .add-row input::placeholder { color: rgba(255,255,255,0.2); }
+  .add-row input { flex: 2; min-width: 150px; }
+  .add-row select { flex: 1; min-width: 120px; }
+  .add-row select option { background: #222; }
+  .add-btn {
+    background: var(--accent);
+    color: #0d0d0d;
+    border: none;
+    border-radius: 10px;
+    padding: 9px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    white-space: nowrap;
+  }
+  .add-btn:hover { opacity: 0.88; }
+  .add-btn:active { transform: scale(0.97); }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 40px;
+    padding: 10px 22px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    transition: transform 0.3s cubic-bezier(.34,1.56,.64,1);
+    z-index: 100;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Sync indicator */
+  .sync {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .sync-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+  }
+  .sync-dot.syncing {
+    background: var(--accent);
+    animation: pulse 0.8s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<div class="sync"><div class="sync-dot" id="sync-dot"></div><span id="sync-label">live</span></div>
+
+<div class="hero">
+  <div class="hero-label">🎂 Tariq's Geburtstag</div>
+  <h1>Was bringst du<br><span>mit?</span></h1>
+  <p class="hero-sub">Trag deinen Namen ein, hak ab was du mitbringst – oder füg selbst etwas hinzu!</p>
+  <div class="stats">
+    <div class="stat"><span class="stat-num" id="st-total">0</span><span class="stat-label">Sachen</span></div>
+    <div class="stat"><span class="stat-num" id="st-claimed">0</span><span class="stat-label">geclaimed</span></div>
+    <div class="stat"><span class="stat-num" id="st-open">0</span><span class="stat-label">noch offen</span></div>
+  </div>
+</div>
+
+<div class="name-bar">
+  <div class="name-input-wrap">
+    <label>👤 Dein Name:</label>
+    <input type="text" id="my-name" placeholder="z.B. Lisa" autocomplete="off" />
+  </div>
+</div>
+
+<div class="main" id="main"></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = "tariq_party_2026";
+
+const DEFAULT_DATA = [
+  {
+    cat: "🍺 Alkohol",
+    items: [
+      { name: "Bier (Kiste)", priority: "needed", claimed: false, who: "" },
+      { name: "Wein (rot)", priority: "needed", claimed: false, who: "" },
+      { name: "Wein (weiß)", priority: "needed", claimed: false, who: "" },
+      { name: "Sekt / Prosecco", priority: "optional", claimed: false, who: "" },
+      { name: "Vodka", priority: "optional", claimed: false, who: "" },
+      { name: "Rum", priority: "optional", claimed: false, who: "" },
+      { name: "Gin", priority: "optional", claimed: false, who: "" },
+      { name: "Whisky", priority: "optional", claimed: false, who: "" },
+    ]
+  },
+  {
+    cat: "🥤 Softdrinks & Mixer",
+    items: [
+      { name: "Cola", priority: "needed", claimed: false, who: "" },
+      { name: "Wasser (still)", priority: "needed", claimed: false, who: "" },
+      { name: "Wasser (sprudelnd)", priority: "needed", claimed: false, who: "" },
+      { name: "Säfte / Schorlen", priority: "optional", claimed: false, who: "" },
+      { name: "Energy Drinks", priority: "optional", claimed: false, who: "" },
+      { name: "Tonic Water", priority: "optional", claimed: false, who: "" },
+    ]
+  },
+  {
+    cat: "🍕 Essen",
+    items: [
+      { name: "Chips & Snacks", priority: "needed", claimed: false, who: "" },
+      { name: "Brot / Brötchen", priority: "needed", claimed: false, who: "" },
+      { name: "Grill-Fleisch", priority: "optional", claimed: false, who: "" },
+      { name: "Gemüse / Salat", priority: "optional", claimed: false, who: "" },
+      { name: "Dips (Hummus etc.)", priority: "optional", claimed: false, who: "" },
+      { name: "Dessert / Kuchen", priority: "optional", claimed: false, who: "" },
+    ]
+  },
+  {
+    cat: "⛺ Party-Equipment",
+    items: [
+      { name: "Partyzelt", priority: "needed", claimed: false, who: "" },
+      { name: "Partylichter", priority: "needed", claimed: false, who: "" },
+      { name: "Kabeltrommel", priority: "needed", claimed: false, who: "" },
+    ]
+  },
+  {
+    cat: "🏓 Beer Pong & Rage Cage",
+    items: [
+      { name: "Beer Pong Becher", priority: "needed", claimed: false, who: "" },
+      { name: "Beer Pong Bälle", priority: "needed", claimed: false, who: "" },
+      { name: "Rage Cage Tisch", priority: "needed", claimed: false, who: "" },
+      { name: "Trichter", priority: "needed", claimed: false, who: "" },
+    ]
+  }
+];
+
+let state = JSON.parse(JSON.stringify(DEFAULT_DATA));
+let collapsed = {};
+let myName = "";
+let pollTimer = null;
+
+// --- Storage ---
+async function load() {
+  setSyncing(true);
+  try {
+    const res = await window.storage?.get(STORAGE_KEY, true);
+    if (res && res.value) {
+      const saved = JSON.parse(res.value);
+      if (saved && saved.length) state = saved;
+    }
+  } catch(e) {}
+  setSyncing(false);
+  render();
+}
+
+async function save() {
+  setSyncing(true);
+  try {
+    await window.storage?.set(STORAGE_KEY, JSON.stringify(state), true);
+  } catch(e) {}
+  setSyncing(false);
+}
+
+function setSyncing(s) {
+  const dot = document.getElementById("sync-dot");
+  const lbl = document.getElementById("sync-label");
+  if (s) { dot.className = "sync-dot syncing"; lbl.textContent = "syncing..."; }
+  else { dot.className = "sync-dot"; lbl.textContent = "live"; }
+}
+
+// Poll for updates every 8 seconds
+function startPoll() {
+  pollTimer = setInterval(async () => {
+    try {
+      const res = await window.storage?.get(STORAGE_KEY, true);
+      if (res && res.value) {
+        const saved = JSON.parse(res.value);
+        if (saved && JSON.stringify(saved) !== JSON.stringify(state)) {
+          state = saved;
+          render();
+          showToast("Liste wurde aktualisiert 🔄");
+        }
+      }
+    } catch(e) {}
+  }, 8000);
+}
+
+// --- Render ---
+function render() {
+  const main = document.getElementById("main");
+  main.innerHTML = "";
+
+  let total = 0, claimed = 0;
+
+  state.forEach((sec, si) => {
+    const secClaimed = sec.items.filter(i => i.claimed).length;
+    total += sec.items.length;
+    claimed += secClaimed;
+    const isCollapsed = collapsed[si];
+
+    const div = document.createElement("div");
+    div.className = "section" + (isCollapsed ? " collapsed" : "");
+
+    const header = document.createElement("div");
+    header.className = "section-header";
+    header.innerHTML = `
+      <span class="section-emoji">${sec.cat.split(' ')[0]}</span>
+      <span class="section-title">${sec.cat.split(' ').slice(1).join(' ')}</span>
+      <span class="section-pill ${secClaimed === sec.items.length && sec.items.length > 0 ? 'done' : ''}">${secClaimed}/${sec.items.length}</span>
+      <span class="section-chevron">▼</span>
+    `;
+    header.addEventListener("click", () => {
+      collapsed[si] = !collapsed[si];
+      render();
+    });
+
+    const list = document.createElement("div");
+    list.className = "items-list";
+
+    sec.items.forEach((item, ii) => {
+      const row = document.createElement("div");
+      row.className = "item" + (item.claimed ? " claimed" : "");
+      row.innerHTML = `
+        <div class="check">${item.claimed ? "✓" : ""}</div>
+        <div class="item-info">
+          <div class="item-name">${item.name}</div>
+          ${item.claimed && item.who ? `<div class="item-who">↳ ${item.who}</div>` : ""}
+        </div>
+        <span class="item-badge ${item.claimed ? 'badge-claimed' : item.priority === 'needed' ? 'badge-needed' : 'badge-optional'}">
+          ${item.claimed ? "✓ geclaimed" : item.priority === "needed" ? "benötigt" : "optional"}
+        </span>
+      `;
+      row.addEventListener("click", () => toggleItem(si, ii));
+      list.appendChild(row);
+    });
+
+    div.appendChild(header);
+    div.appendChild(list);
+    main.appendChild(div);
+  });
+
+  // Add box
+  const addBox = document.createElement("div");
+  addBox.className = "add-box";
+  const catOptions = state.map((s, i) => `<option value="${i}">${s.cat}</option>`).join("");
+  addBox.innerHTML = `
+    <div class="add-box-title">+ Etwas hinzufügen</div>
+    <div class="add-row">
+      <input type="text" id="new-item-name" placeholder="Was bringst du mit?" />
+      <select id="new-item-cat">${catOptions}</select>
+      <button class="add-btn" onclick="addItem()">Hinzufügen</button>
+    </div>
+  `;
+  main.appendChild(addBox);
+
+  document.getElementById("st-total").textContent = total;
+  document.getElementById("st-claimed").textContent = claimed;
+  document.getElementById("st-open").textContent = total - claimed;
+
+  const nameEl = document.getElementById("new-item-name");
+  if (nameEl) {
+    nameEl.addEventListener("keydown", e => { if (e.key === "Enter") addItem(); });
+  }
+}
+
+function toggleItem(si, ii) {
+  const item = state[si].items[ii];
+  if (!item.claimed) {
+    const name = document.getElementById("my-name").value.trim();
+    item.claimed = true;
+    item.who = name || "Jemand";
+    showToast(`"${item.name}" geclaimed${name ? " von " + name : ""} ✓`);
+  } else {
+    item.claimed = false;
+    item.who = "";
+    showToast(`"${item.name}" wieder freigegeben`);
+  }
+  save();
+  render();
+}
+
+function addItem() {
+  const nameEl = document.getElementById("new-item-name");
+  const catEl = document.getElementById("new-item-cat");
+  const name = nameEl ? nameEl.value.trim() : "";
+  const si = catEl ? parseInt(catEl.value) : 0;
+  if (!name) return;
+  const myN = document.getElementById("my-name").value.trim();
+  state[si].items.push({ name, priority: "optional", claimed: !!myN, who: myN || "" });
+  nameEl.value = "";
+  save();
+  render();
+  showToast(`"${name}" wurde hinzugefügt 🎉`);
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2600);
+}
+
+// Name persistence
+document.getElementById("my-name").addEventListener("input", function() {
+  myName = this.value;
+  localStorage.setItem("party_name", myName);
+});
+const savedName = localStorage.getItem("party_name");
+if (savedName) { document.getElementById("my-name").value = savedName; myName = savedName; }
+
+load();
+startPoll();
+</script>
+</body>
+</html>
